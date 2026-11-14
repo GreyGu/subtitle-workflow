@@ -2,41 +2,63 @@
 
 A Codex skill for finding and reviewing multilingual subtitles for films and TV series. It looks for subtitles that match your video release, checks timing, missing lines, and translation quality, and flags anything that still needs review while preserving the original files.
 
-[下载 v1.4.0 安装包](https://github.com/GreyGu/subtitle-workflow/releases/download/v1.4.0/subtitle-workflow-1.4.0.zip) · [版本记录](https://github.com/GreyGu/subtitle-workflow/releases) · [反馈问题](https://github.com/GreyGu/subtitle-workflow/issues)
+[Download v1.4.0](https://github.com/GreyGu/subtitle-workflow/releases/download/v1.4.0/subtitle-workflow-1.4.0.zip) · [Releases](https://github.com/GreyGu/subtitle-workflow/releases) · [Report an issue](https://github.com/GreyGu/subtitle-workflow/issues)
 
-## 安装与第一次使用
+## Install and get started
 
-1. 下载并解压安装包，将整个 `subtitle-workflow` 文件夹复制到用户目录下的 `.agents/skills/`。Codex 的标准用户级位置为 Windows 的 `%USERPROFILE%\.agents\skills\` 或 macOS 和 Linux 的 `~/.agents/skills/`。也可复制到项目的 `.agents/skills/`，供该项目使用。升级时先备份旧文件夹，并确保技能目录下只留一个同名版本。
-2. 确认目录结构为 `.agents/skills/subtitle-workflow/SKILL.md`。在 Codex 中输入 `$subtitle-workflow` 选择技能，未出现时重启 Codex。
-3. 将这段提示词里的影片路径、语言和保存目录换成自己的信息。
+1. Download and extract the ZIP. Copy the entire `subtitle-workflow` folder into `%USERPROFILE%\.agents\skills\` on Windows or `~/.agents/skills/` on macOS and Linux. For a project-only installation, use the project's `.agents/skills/` directory. When upgrading, back up the old folder outside the skill discovery directories before replacing it.
+2. Check that the installed folder contains `subtitle-workflow/SKILL.md` under `.agents/skills/`. Type `$subtitle-workflow` in Codex to select the skill. If it does not appear, restart Codex.
+3. Replace the placeholders in this prompt with your details.
 
-> 使用 $subtitle-workflow，为【视频路径】寻找简体中文字幕，原音轨是【实际语言】。先按这个片源核对候选，并抽查同步和缺句。将结果保存到【目录】，保留原件，列出仍待确认的问题。
+> Use $subtitle-workflow to find Simplified Chinese subtitles for [video path]. The audio track is in [source language]. Check that the subtitles match this release and spot-check the timing and missing lines. Save the results to [output directory], preserve the original files, and list anything that still needs review.
 
-没有本地视频时，可以检索候选和复核字幕正文，声画同步留待拿到片源后核验。需要按片段逐句复核时，请在提示词中明确说明。
+Ask for a **full review** if you want a line-by-line check. Without the video, the skill can still find candidates and review subtitle text, with playback sync marked as unverified.
 
-## 用原创样例试跑
+## How it works
 
-在解压后的 `subtitle-workflow` 目录运行。需要 Python 3.10 或更高版本，只使用 Python 自带模块。Windows 可用 `py -3`，macOS 或 Linux 上也可按本机安装情况用 `python3` 替换 `python`。
+```mermaid
+flowchart TD
+    scope["Confirm the title, release, audio track, target language, and review scope"]
+    candidates["Check embedded and local subtitles first, then search online if needed"]
+    scope --> candidates
+    candidates --> request{"What did the user request?"}
+    request -->|Links or candidates only| shortlist["Return links or candidates with source and version notes"]
+    request -->|Subtitle review or repair| inspect["Preserve originals, remove duplicates, and check format, encoding, and structure"]
+    inspect --> video{"Is the matching video available?"}
+    video -->|No| pending["Report structural and text findings, with playback sync unverified"]
+    video -->|Yes| align["Check timing against the audio and identify any offsets, drift, or cut differences"]
+    align --> depth{"What level of review is needed?"}
+    depth -->|Spot check| spots["Check early, middle, and late scenes and any flagged segments"]
+    depth -->|Full review| full["Check dialogue line by line for timing, coverage, accuracy, clarity, and style"]
+    spots --> resolve["Record findings and apply authorized fixes to a working copy"]
+    full --> resolve
+    resolve --> verify["Recheck the final files and test them in the video for playable delivery"]
+    verify --> deliver["Deliver subtitles or findings with sources, changes, and unresolved issues"]
+```
+
+## Try the included sample
+
+Run both commands from the extracted `subtitle-workflow` folder. The scripts require Python 3.10 or later and use only the Python standard library. If needed, substitute `py -3` on Windows or `python3` on macOS and Linux for `python`.
 
 ```sh
 python -B -X utf8 scripts/subtitle_audit.py audit assets/examples/zh-en/target.en.srt
 python -B -X utf8 scripts/subtitle_audit.py map-check --target assets/examples/zh-en/target.en.srt --reference assets/examples/zh-en/source.zh.srt --mapping assets/examples/zh-en/review-map.json --require-quality-review
 ```
 
-第一条检查英文 SRT（纯文本字幕）的编码、时间轴和正文结构。第二条检查中文参考字幕与英文目标字幕的逐句对应记录，并确认审核状态已填写。样例由原创短句组成，无需影片、账号或网络。检查通过表示样例文件和审核记录满足规则，真实影片的同步与翻译质量仍要结合音轨和上下文判断。
+The first command checks the English SRT file, a plain-text subtitle format, for encoding, timing, and cue structure. The second checks the cue-by-cue mapping from the Chinese reference to the English subtitles and verifies that the required review records are complete. The sample uses original dialogue and runs without a video, an account, or an internet connection. Assessing sync and translation for a real film requires the audio and scene context.
 
-## 功能与工具
+## Features and tools
 
-| 任务 | 能做什么 |
+| Task | What the skill does |
 | --- | --- |
-| 查找与选择候选 | 让 Codex 按片名、集数、剪辑版本和音轨筛选。联网查找和下载取决于可用工具和站点访问情况。 |
-| 检查 SRT | 本地检查时间顺序、正文缺漏和参考覆盖。默认只读，主动导出时写入指定的新文件。 |
-| 核对音画与译文 | 按原音轨和上下文判断缺句、错译及文体。视频核验按需使用 FFmpeg/ffprobe 或播放器。 |
-| 长剧集和多语言 | 用 `subtitle_progress.py` 记录每集进度，识别重复候选，并在输入匹配时复用已有结果。 |
+| Find subtitle candidates | Filter by title, episode, release, and audio track. Online search and downloads depend on the tools available to Codex and access to the source site. |
+| Audit SRT files | Check timing, empty cues, and coverage against a reference when provided. Checks are read-only by default. Explicit exports write to new files. |
+| Review sync and translation | Check for missing lines, mistranslations, and style issues against the audio and scene context. Use FFmpeg, ffprobe, or a media player as needed. |
+| Track series and multilingual jobs | Use `subtitle_progress.py` to track progress by episode, identify duplicate candidates, and reuse results when the inputs match. |
 
-ASS/SSA 排版字幕和 PGS/SUP 图片字幕需要对应工具处理。语言方向由实际音轨和目标语言决定。
+The bundled checker supports SRT. Styled ASS/SSA subtitles and bitmap-based PGS/SUP subtitles use format-specific tools. The translation direction follows the actual audio track and requested target language.
 
-## 测试与打包
+## Test and package
 
 ```sh
 python -B -X utf8 -m unittest discover -s scripts -p "test_*.py" -v
@@ -44,6 +66,10 @@ python -B -X utf8 scripts/package_skill.py build --output dist/subtitle-workflow
 python -B -X utf8 scripts/package_skill.py verify dist/subtitle-workflow-1.4.0.zip
 ```
 
-发布包只包含清单内的文件。校验器检查文件集合、版本和 SHA-256 文件指纹。脚本参数与退出码见 [使用说明](references/script-usage.md)，技能入口见 [SKILL.md](SKILL.md)。
+The archive contains only files on the packaging list. The verifier checks file membership, version, and SHA-256 file hashes against the manifest. See the [script reference](references/script-usage.md) for options and exit codes and [SKILL.md](SKILL.md) for the instructions Codex follows.
 
-提交问题时，请提供技能版本、操作系统、运行命令和去除私人路径后的报错。最小复现可用自编短句。项目采用 [MIT 许可证](LICENSE)，发布素材包含项目源码、文档和原创样例。
+## Feedback and license
+
+When reporting an issue, include the skill version, operating system, command, and error message with private paths removed. Use original sample dialogue to reproduce subtitle issues where possible.
+
+The source, documentation, and original samples are available under the [MIT License](LICENSE).
