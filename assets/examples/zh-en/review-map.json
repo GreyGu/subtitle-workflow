@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.1",
+  "metadata": {
+    "source_languages": ["cmn"],
+    "target_language": "en",
+    "target_convention": "Neutral conversational English; no regional dialect specified.",
+    "reviewer": "Skill author, model-assisted text review of original fictional examples; no audio review",
+    "reviewed_at": "2026-10-04",
+    "reference_basis": "Original fictional mini-script, not a film transcript. Cue 1 calms a worried passenger; cue 2 politely lets someone go first at a doorway; cue 3 dryly comments on an unspecified future promise. Cue 4 is only a thunder sound label. Times are synthetic test data."
+  },
+  "target_sha256": "0aceca63f0596d2fbf963713b33108088645ef8879e6adc3afe6863ed9e61b54",
+  "reference_sha256": "daa4990457f00dcb7af023439000c7fae120a34906e426dcac3cb4c5dd37e925",
+  "links": [
+    {
+      "reference_ids": [1], "target_ids": [1], "review": "checked",
+      "quality_review": {
+        "faithfulness": {"status": "pass", "note": "Preserves reassurance and the fact that the last bus has not departed; adds no deadline."},
+        "clarity": {"status": "pass", "note": "The contraction and two short sentences are clear within the synthetic 3.5-second display."},
+        "style": {"status": "pass", "note": "Easy is a brief calming instruction appropriate to the stated fictional conversational scene."}
+      }
+    },
+    {
+      "reference_ids": [2], "target_ids": [2], "review": "checked",
+      "quality_review": {
+        "faithfulness": {"status": "pass", "note": "The stated doorway context supports letting the other person go first, not ordering them to leave."},
+        "clarity": {"status": "pass", "note": "After you is an idiomatic and immediately understandable invitation in this context."},
+        "style": {"status": "pass", "note": "Preserves politeness without adding an unsupported title such as sir or madam."}
+      }
+    },
+    {
+      "reference_ids": [3], "target_ids": [3], "review": "checked",
+      "quality_review": {
+        "faithfulness": {"status": "pass", "note": "Keeps the unspecified future promise and absence of a date; invents no particular day."},
+        "clarity": {"status": "pass", "note": "The contrast is conveyed by two short sentences rather than a literal repeated which day structure."},
+        "style": {"status": "pass", "note": "The concise second sentence retains the fictional speaker's dry tone without adding a new joke."}
+      }
+    }
+  ],
+  "excluded_reference": [
+    {"id": 4, "category": "non_speech", "reason": "The fictional script explicitly labels thunder only. This example targets ordinary dialogue subtitles, not SDH."}
+  ],
+  "target_only": []
+}

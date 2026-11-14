@@ -1,0 +1,9 @@
+/过往版本/
+/dist/
+/work/
+/outputs/
+*.zip
+__pycache__/
+*.py[cod]
+.env
+.env.*

@@ -1,0 +1,4 @@
+interface:
+  display_name: "多语言字幕查找与信达雅校验"
+  short_description: "查找任意目标语言字幕，核查全片时间轴、完整度及信达雅，保留依据并备份交付"
+  default_prompt: "使用 $subtitle-workflow 为指定影片寻找目标语言字幕，逐句检查信、达、雅及全片时间轴和完整度，按授权修复并保存到指定目录。"

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Subtitle review map 1.1",
+  "description": "A local data contract. Status fields record reviewer declarations, not automatic semantic certification. Legacy unversioned maps are handled separately by the CLI.",
+  "type": "object",
+  "required": ["schema_version", "metadata", "target_sha256", "reference_sha256"],
+  "properties": {
+    "schema_version": {"const": "1.1"},
+    "target_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+    "reference_sha256": {"type": "string", "pattern": "^[0-9a-fA-F]{64}$"},
+    "metadata": {
+      "type": "object",
+      "required": ["source_languages", "target_language", "reviewer", "reviewed_at", "reference_basis"],
+      "properties": {
+        "source_languages": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/language"}},
+        "target_language": {"$ref": "#/$defs/language"},
+        "reviewer": {"$ref": "#/$defs/nonblank"},
+        "reviewed_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "format": "date"},
+        "reference_basis": {"$ref": "#/$defs/nonblank"},
+        "target_convention": {"type": "string"}
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["reference_ids", "target_ids"],
+        "properties": {
+          "reference_ids": {"$ref": "#/$defs/ids"},
+          "target_ids": {"$ref": "#/$defs/ids"},
+          "review": {"enum": ["checked", "uncertain", "unreviewed"]},
+          "quality_review": {"$ref": "#/$defs/quality"}
+        }
+      }
+    },
+    "excluded_reference": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "reason"],
+        "properties": {
+          "id": {"type": "integer", "minimum": 0},
+          "category": {"enum": ["non_speech", "credit", "untranscribed_speech", "source_ad", "not_in_target_cut", "unclassified"]},
+          "reason": {"$ref": "#/$defs/nonblank"}
+        }
+      }
+    },
+    "target_only": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "reason"],
+        "properties": {
+          "id": {"type": "integer", "minimum": 0},
+          "category": {"enum": ["opening_credit", "screen_text", "verified_audio_speech", "source_credit"]},
+          "reason": {"$ref": "#/$defs/nonblank"},
+          "quality_review": {"$ref": "#/$defs/quality"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonblank": {"type": "string", "pattern": "\\S"},
+    "language": {"type": "string", "pattern": "^[A-Za-z]{2,8}(?:-[A-Za-z0-9]{1,8})*$"},
+    "ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "integer", "minimum": 0}},
+    "dimension": {
+      "type": "object",
+      "required": ["status"],
+      "additionalProperties": false,
+      "properties": {
+        "status": {"enum": ["pass", "revise", "uncertain", "not_reviewed"]},
+        "note": {"type": "string"}
+      },
+      "if": {"properties": {"status": {"enum": ["pass", "revise", "uncertain"]}}},
+      "then": {"required": ["note"], "properties": {"note": {"$ref": "#/$defs/nonblank"}}}
+    },
+    "quality": {
+      "type": "object",
+      "description": "Missing dimensions remain not_reviewed. Strict CLI mode requires all three to pass; the schema permits incomplete work in progress.",
+      "additionalProperties": false,
+      "properties": {
+        "faithfulness": {"$ref": "#/$defs/dimension"},
+        "clarity": {"$ref": "#/$defs/dimension"},
+        "style": {"$ref": "#/$defs/dimension"}
+      }
+    }
+  }
+}
