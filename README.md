@@ -1,6 +1,6 @@
 # subtitle-workflow
 
-给 Codex 使用的多语言影视字幕技能。按具体片源查找字幕候选，核对错轴、缺句和译文，保留原件并记录待复核的问题。
+A Codex skill for finding and reviewing multilingual subtitles for films and TV series. It looks for subtitles that match your video release, checks timing, missing lines, and translation quality, and flags anything that still needs review while preserving the original files.
 
 [下载 v1.4.0 安装包](https://github.com/GreyGu/subtitle-workflow/releases/download/v1.4.0/subtitle-workflow-1.4.0.zip) · [版本记录](https://github.com/GreyGu/subtitle-workflow/releases) · [反馈问题](https://github.com/GreyGu/subtitle-workflow/issues)
 
