@@ -1,16 +1,26 @@
 # subtitle-workflow
 
-A Codex skill for finding and reviewing multilingual subtitles for films and TV series. It looks for subtitles that match your video release, checks timing, missing lines, and translation quality, and flags anything that still needs review while preserving the original files.
+An Agent Skill for Codex and Claude Code that finds and reviews multilingual subtitles for films and TV series. It looks for subtitles that match your video release, checks timing, missing lines, and translation quality, and flags anything that still needs review while preserving the original files.
 
 [Download v1.4.0](https://github.com/GreyGu/subtitle-workflow/releases/download/v1.4.0/subtitle-workflow-1.4.0.zip) · [Releases](https://github.com/GreyGu/subtitle-workflow/releases) · [Report an issue](https://github.com/GreyGu/subtitle-workflow/issues)
 
 ## Install and get started
 
-1. Download and extract the ZIP. Copy the entire `subtitle-workflow` folder into `%USERPROFILE%\.agents\skills\` on Windows or `~/.agents/skills/` on macOS and Linux. For a project-only installation, use the project's `.agents/skills/` directory. When upgrading, back up the old folder outside the skill discovery directories before replacing it.
-2. Check that the installed folder contains `subtitle-workflow/SKILL.md` under `.agents/skills/`. Type `$subtitle-workflow` in Codex to select the skill. If it does not appear, restart Codex.
-3. Replace the placeholders in this prompt with your details.
+Download and extract the ZIP. Copy the entire `subtitle-workflow` folder into the skill directory for your client.
 
-> Use $subtitle-workflow to find Simplified Chinese subtitles for [video path]. The audio track is in [source language]. Check that the subtitles match this release and spot-check the timing and missing lines. Save the results to [output directory], preserve the original files, and list anything that still needs review.
+| Client | Personal installation | Project installation | Invoke |
+| --- | --- | --- | --- |
+| Codex | `~/.agents/skills/` | `.agents/skills/` | `$subtitle-workflow` |
+| Claude Code | `~/.claude/skills/` | `.claude/skills/` | `/subtitle-workflow` |
+
+On Windows, `~` refers to your user profile directory (`%USERPROFILE%`). Verify that the destination contains `subtitle-workflow/SKILL.md`. When upgrading, back up the old folder outside the skill directories before replacing it. If the skill does not appear, start a new session.
+
+Use the invocation for your client, followed by a request like this:
+
+> Find Simplified Chinese subtitles for [video path]. The audio track is in [source language]. Check that the subtitles match this release and spot-check timing and missing lines. Save the results to [output directory], preserve the original files, and list anything that still needs review.
+
+The same ZIP works for both installation paths. Both clients use `SKILL.md`, the accompanying references, and the local Python scripts. The optional `agents/openai.yaml` file provides Codex interface metadata. Web search, downloads, and playback checks depend on each client's tools, permissions, and local media utilities.
+
 
 Ask for a **full review** if you want a line-by-line check. Without the video, the skill can still find candidates and review subtitle text, with playback sync marked as unverified.
 
@@ -51,7 +61,7 @@ The first command checks the English SRT file, a plain-text subtitle format, for
 
 | Task | What the skill does |
 | --- | --- |
-| Find subtitle candidates | Filter by title, episode, release, and audio track. Online search and downloads depend on the tools available to Codex and access to the source site. |
+| Find subtitle candidates | Filter by title, episode, release, and audio track. Online search and downloads depend on the tools available to your client and access to the source site. |
 | Audit SRT files | Check timing, empty cues, and coverage against a reference when provided. Checks are read-only by default. Explicit exports write to new files. |
 | Review sync and translation | Check for missing lines, mistranslations, and style issues against the audio and scene context. Use FFmpeg, ffprobe, or a media player as needed. |
 | Track series and multilingual jobs | Use `subtitle_progress.py` to track progress by episode, identify duplicate candidates, and reuse results when the inputs match. |
@@ -66,7 +76,7 @@ python -B -X utf8 scripts/package_skill.py build --output dist/subtitle-workflow
 python -B -X utf8 scripts/package_skill.py verify dist/subtitle-workflow-1.4.0.zip
 ```
 
-The archive contains only files on the packaging list. The verifier checks file membership, version, and SHA-256 file hashes against the manifest. See the [script reference](references/script-usage.md) for options and exit codes and [SKILL.md](SKILL.md) for the instructions Codex follows.
+The archive contains only files on the packaging list. The verifier checks file membership, version, and SHA-256 file hashes against the manifest. See the [script reference](references/script-usage.md) for options and exit codes and [SKILL.md](SKILL.md) for the shared skill instructions.
 
 ## Feedback and license
 
